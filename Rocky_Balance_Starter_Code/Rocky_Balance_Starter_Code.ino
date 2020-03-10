@@ -28,9 +28,9 @@ extern int32_t distanceRight;
 float speedCont = 0;
 float displacement_m = 0;
 int16_t limitCount = 0;
-uint32_t cur_time = 0;  
-float distLeft_m;       
-float distRight_m;       
+uint32_t cur_time = 0;
+float distLeft_m;
+float distRight_m;
 
 
 extern uint32_t delta_ms;
@@ -39,7 +39,7 @@ float measured_speedR = 0;
 float desSpeedL=0;
 float desSpeedR =0;
 float dist_accumL_m = 0;
-float dist_accumR_m = 0; 
+float dist_accumR_m = 0;
 float dist_accum = 0;
 float speed_err_left = 0;
 float speed_err_right = 0;
@@ -56,7 +56,7 @@ float angle_prev_rad = 0; // previous angle measurement
 extern int32_t displacement;
 int32_t prev_displacement=0;
 uint32_t prev_time;
- 
+
 #define G_RATIO (162.5)
 
 
@@ -68,7 +68,7 @@ Balboa32U4Buzzer buzzer;
 Balboa32U4ButtonA buttonA;
 
 
-#define FIXED_ANGLE_CORRECTION (0.26)  // Replace the value 0.25 with the value you obtained from the Gyro calibration procedure
+#define FIXED_ANGLE_CORRECTION (-0.27)  // Replace the value 0.25 with the value you obtained from the Gyro calibration procedure
 
 
 
@@ -85,12 +85,12 @@ void BalanceRocky()
 {
 
     // Enter the control parameters here
-    
+
     float Kp = 0;
     float Ki = 0;
 
     float Ci = 0;
-    
+
     float Jp = 0;
     float Ji = 0;
 
@@ -99,39 +99,39 @@ void BalanceRocky()
     float v_d = 0; // this is the desired speed produced by the angle controller
 
 
-   // Variables available to you are: 
+   // Variables available to you are:
    // angle_rad  - angle in radians
    // angle_rad_accum - integral of angle
    // measured_speedR - right wheel speed (m/s)
    // measured_speedL - left wheel speed (m/s)
    // distLeft_m - distance traveled by left wheel in meters
-   // distRight_m - distance traveled by right wheel in meters  (this is the integral of the velocities) 
+   // distRight_m - distance traveled by right wheel in meters  (this is the integral of the velocities)
    // dist_accum - integral of the distance
 
-    
-    v_d = Kp*angle_rad + Ki*angle_rad_accum;  // this is the desired velocity from the angle controller 
-      
 
-  // The next two lines implement the feedback controller for the motor. Two separate velocities are calculated. 
+    v_d = Kp*angle_rad + Ki*angle_rad_accum;  // this is the desired velocity from the angle controller
+
+
+  // The next two lines implement the feedback controller for the motor. Two separate velocities are calculated.
   //
   //
-  // We use a trick here by criss-crossing the distance from left to right and 
+  // We use a trick here by criss-crossing the distance from left to right and
   // right to left. This helps ensure that the Left and Right motors are balanced
-   
-    v_c_R = v_d - Jp*measured_speedR - Ji*distLeft_m  - dist_accum*Ci;         
-    v_c_L = v_d - Jp*measured_speedL - Ji*distRight_m - dist_accum*Ci;         
+
+    v_c_R = v_d - Jp*measured_speedR - Ji*distLeft_m  - dist_accum*Ci;
+    v_c_L = v_d - Jp*measured_speedL - Ji*distRight_m - dist_accum*Ci;
 
     // save desired speed for debugging
     desSpeedL = v_c_L;
     desSpeedR = v_c_R;
 
-    // the motor control signal has to be between +- 300. So clip the values to be within that range 
+    // the motor control signal has to be between +- 300. So clip the values to be within that range
     // here
     if(v_c_L > 300) v_c_L = 300;
     if(v_c_R > 300) v_c_R = 300;
     if(v_c_L < -300) v_c_L = -300;
     if(v_c_R < -300) v_c_R = -300;
-   
+
     // Set the motor speeds
     motors.setSpeeds((int16_t) (v_c_L), (int16_t)(v_c_R));
 
@@ -155,7 +155,7 @@ void setup()
   angle_accum = 0;
 
   ledGreen(0);
-  ledYellow(0);  
+  ledYellow(0);
 }
 
 
@@ -179,7 +179,7 @@ void UpdateSensors()
 
   // call functions to integrate encoders and gyros
   balanceUpdateSensors();
- 
+
   if (imu.a.x < 0)
   {
     lyingDown();
@@ -197,14 +197,14 @@ void GetMotorAndAngleMeasurements()
 {
     // convert distance calculation into meters
     // and integrate distance
-    distLeft_m = ((float)distanceLeft)/((float)G_RATIO)/12.0*80.0/1000.0*3.14159;       
-    distRight_m = ((float)distanceRight)/((float)G_RATIO)/12.0*80.0/1000.0*3.14159;       
+    distLeft_m = ((float)distanceLeft)/((float)G_RATIO)/12.0*80.0/1000.0*3.14159;
+    distRight_m = ((float)distanceRight)/((float)G_RATIO)/12.0*80.0/1000.0*3.14159;
     dist_accum += (distLeft_m+distRight_m)*0.01/2.0;
 
     // compute left and right wheel speed in meters/s
     measured_speedL = speedLeft/((float)G_RATIO)/12.0*80.0/1000.0*3.14159*100.0;
     measured_speedR = speedRight/((float)G_RATIO)/12.0*80.0/1000.0*3.14159*100.0;
-    
+
     prevDistLeft_m = distLeft_m;
     prevDistRight_m = distRight_m;
 
@@ -214,7 +214,7 @@ void GetMotorAndAngleMeasurements()
     // this is the derivative of the angle
     angle_rad_diff = (angle_rad-angle_prev_rad)/0.01;
     angle_prev_rad  = angle_rad;
- 
+
 }
 
 void balanceResetAccumulators()
@@ -233,24 +233,24 @@ void loop()
   int16_t distanceDiff;    // this stores the difference in distance in encoder clicks that was traversed by the right vs the left wheel
   static float del_theta = 0;
   char enableLongTermGyroCorrection = 1;
-  
+
   cur_time = millis();                   // get the current time in miliseconds
 
 
   if((cur_time - prev_time) > UPDATE_TIME_MS){
     UpdateSensors();                    // run the sensor updates.
-    
+
     // calculate the angle in radians. The FIXED_ANGLE_CORRECTION term comes from the angle calibration procedure (separate sketch available for this)
     // del_theta corrects for long-term drift
     angle_rad = ((float)angle)/1000/180*3.14159 - FIXED_ANGLE_CORRECTION - del_theta;
-    
+
     if(angle_rad > 0.1 || angle_rad < -0.1)      // If angle is not within +- 6 degrees, reset counter that waits for start
     {
       start_counter = 0;
    }
 
-  
-  if(angle_rad > -0.1 && angle_rad < 0.1 && ! start_flag)   
+
+  if(angle_rad > -0.1 && angle_rad < 0.1 && ! start_flag)
   {
     // increment the start counter
     start_counter++;
@@ -272,12 +272,12 @@ void loop()
     GetMotorAndAngleMeasurements();
     if(enableLongTermGyroCorrection)
       del_theta = 0.999*del_theta + 0.001*angle_rad;  // assume that the robot is standing. Smooth out the angle to correct for long-term gyro drift
-    
+
     // Control the robot
     BalanceRocky();
   }
   prev_time = cur_time;
-  }  
+  }
 // if the robot is more than 45 degrees, shut down the motor
   if(start_flag && angle_rad > .78)
   {
@@ -288,7 +288,7 @@ void loop()
   {
     motors.setSpeeds(0,0);
     start_flag = 0;
-  } 
+  }
 
 // kill switch
   if(buttonA.getSingleDebouncedPress())
@@ -299,18 +299,17 @@ void loop()
 
 if(cur_time - prev_print_time > 103)   // do the printing every 105 ms. Don't want to do it for an integer multiple of 10ms to not hog the processor
   {
-        Serial.print(angle_rad);   
+        Serial.print(angle_rad);
         Serial.print("\t");
         Serial.print(distLeft_m);
         Serial.print("\t");
         Serial.print(measured_speedL);
-        Serial.print("\t");      
+        Serial.print("\t");
         Serial.print(measured_speedR);
-        Serial.print("\t");      
+        Serial.print("\t");
        Serial.println(speedCont);
        prev_print_time = cur_time;
   }
 
- 
-}
 
+}
