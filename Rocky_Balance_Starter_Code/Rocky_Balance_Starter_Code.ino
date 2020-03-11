@@ -86,14 +86,23 @@ void BalanceRocky()
 
     // Enter the control parameters here
 
-    float Kp = 1554.7;
-    float Ki = 10071;
+//    float Kp = 1554.7;
+//    float Ki = 10071;
+//
+//    float Ci = -402.5515;
+//
+//    float Jp = 85.7143;
+//    float Ji = -852.6587;
 
-    float Ci = -402.5515;
+    float Jp = 542.85;
+    float Ji = -3135.6;
+    
+    float Kp = 6159.3;
+    float Ki = 31171;
 
-    float Jp = 85.7143;
-    float Ji = -852.6587;
+    float Ci = -1385.5;
 
+ 
 
     float v_c_L, v_c_R; // these are the control velocities to be sent to the motors
     float v_d = 0; // this is the desired speed produced by the angle controller
