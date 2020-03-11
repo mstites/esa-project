@@ -25,3 +25,9 @@ Avg: 1365.5 ms -> 1.366 seconds
 .732 Hz
 4.6 rad/s
 Length = .463m
+
+## Fucking with the Poles
+Poles 1 and 2 (frequency poles)
+* -.5 baseline
+* -.05 stay within one place but wobble a lot
+* -5.5 made it stand perfectly straight up but walk, but walked back
