@@ -20,7 +20,6 @@ wn = 1/period;
 g = 9.85;
 length = g/(wn*2*pi)^2;
 
-x = 42;
 str = ['Natural Frequency (mean): ', num2str(wn), ' Hz', '     Length: ', num2str(length), 'm'];
 t = annotation('textbox', 'String', str, 'BackgroundColor', 'white', 'Position', [.15, .1, .1, .1]);
 sz = t.FontSize;
