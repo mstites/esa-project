@@ -1,27 +1,38 @@
-load('penLenData.mat')
+load('motorCalData.mat')
 
 clf;
-timeAdj = (time - 9020)/1000;
-[pks, locs] = findpeaks(angle);
+timeAdj = (time - 3001)/1000;
 
-hold on
-plot(timeAdj, angle, '.b')
-plot(timeAdj, angle, 'c')
-plot(timeAdj(locs), pks, 'b*')
-hold off
+% find the mean between the two lines
+speedNorm = (speedR - speedL)/2 + speedL;
+% cftool(timeAdj, speedNorm) % find the curve to fit the motor
+a = 0.8024;
+b = 0.004539;
+c = -0.8429;
+d = -19.56;
+fit = a.*exp(b.*timeAdj) + c.*exp(d.*timeAdj);
+
+K = max(fit); % steady state
+steadyState = .985*K;
+timeConstantPos = find(fit>steadyState,1);
+tau = timeAdj(timeConstantPos); % time constant: find the time where is practicially at steady state
+a = 1/tau;
+b = K;
+
+hold on;
+plot(timeAdj, speedR, 'bo')
+plot(timeAdj, speedL, 'go')
+plot(timeAdj, fit, 'k')
+scatter(tau, steadyState, '*')
+% plot(timeAdj, speedNorm, 'mo')
+hold off;
+
+title('Motor Speed vs Time (fit)')
 xlabel('Time (s)')
-ylabel('Angle (Reported from Rocky)')
-title('Angle versus Time')
+ylabel('Motor Speed (m/s)')
+legend({'Speed Right', 'Speed Left', 'Fit', 'Time Constant Position'}, 'Location','southeast')
 
-legend({'Data Points', 'Data Fit', 'Local Maxima'}, 'Location','southeast')
-
-period = mean(diff(timeAdj(locs)));
-wn = 1/period;
-g = 9.85;
-length = g/(wn*2*pi)^2;
-
-x = 42;
-str = ['Natural Frequency (mean): ', num2str(wn), ' Hz', '     Length: ', num2str(length), 'm'];
-t = annotation('textbox', 'String', str, 'BackgroundColor', 'white', 'Position', [.15, .1, .1, .1]);
+str = ["Steady state: " + num2str(K) + " m/s", "Time Constant: " + num2str(tau), "a: " + num2str(a), "b: " + num2str(b)];
+t = annotation('textbox', 'String', str, 'BackgroundColor', 'white', 'Position', [.21, .18, .1, .1]);
 sz = t.FontSize;
 t.FontSize = 10;
